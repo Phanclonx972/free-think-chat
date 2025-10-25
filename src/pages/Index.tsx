@@ -259,12 +259,25 @@ const Index = () => {
         }
       }
 
-      // Save assistant message
-      await supabase.from('messages').insert({
-        conversation_id: activeConversationId,
-        role: 'assistant',
-        content: assistantContent,
-      });
+      // Save assistant message and replace temp with real message
+      const { data: savedMessage } = await supabase
+        .from('messages')
+        .insert({
+          conversation_id: activeConversationId,
+          role: 'assistant',
+          content: assistantContent,
+        })
+        .select()
+        .single();
+
+      // Replace temp message with the real saved message
+      if (savedMessage) {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === tempId ? { ...savedMessage, role: savedMessage.role as "assistant" } : m
+          )
+        );
+      }
 
     } catch (error) {
       console.error('Error:', error);
@@ -306,9 +319,9 @@ const Index = () => {
             </div>
             <div>
               <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Uncensored AI Chat
+                Phanclon.ai
               </h1>
-              <p className="text-xs text-muted-foreground">No filters, no limits</p>
+              <p className="text-xs text-muted-foreground">Advanced Uncensored AI</p>
             </div>
           </div>
         </div>
@@ -322,16 +335,31 @@ const Index = () => {
                     <Sparkles className="h-12 w-12 text-primary-foreground" />
                   </div>
                 </div>
-                <h2 className="text-2xl font-bold">Start a conversation</h2>
-                <p className="text-muted-foreground">
-                  Ask anything without restrictions. This AI provides direct, unfiltered responses.
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-pulse">
+                  Welcome to Phanclon.ai
+                </h2>
+                <p className="text-muted-foreground leading-relaxed">
+                  Experience truly uncensored AI conversations. Ask anything without restrictions - 
+                  Phanclon.ai provides direct, nuanced, and unfiltered responses.
                 </p>
               </div>
             </div>
           ) : (
-            messages.map((message) => (
-              <ChatMessage key={message.id} role={message.role} content={message.content} />
-            ))
+            <>
+              {messages.map((message) => (
+                <ChatMessage key={message.id} role={message.role} content={message.content} />
+              ))}
+              {isLoading && messages[messages.length - 1]?.role === "assistant" && messages[messages.length - 1]?.id.startsWith("temp-") && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground ml-12">
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                  </div>
+                  <span>Phanclon is thinking...</span>
+                </div>
+              )}
+            </>
           )}
         </div>
 

@@ -1,4 +1,4 @@
-import { MessageSquare, Plus, LogOut } from "lucide-react";
+import { MessageSquare, Plus, LogOut, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
@@ -25,11 +25,20 @@ export const ConversationList = ({
   onLogout,
 }: ConversationListProps) => {
   return (
-    <div className="flex flex-col h-full bg-card border-r border-accent/20">
-      <div className="p-4 border-b border-accent/20">
+    <div className="flex flex-col h-full bg-card/50 backdrop-blur-sm border-r border-accent/30">
+      <div className="p-4 border-b border-accent/30">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="p-2 rounded-lg bg-gradient-to-br from-primary to-accent">
+            <Sparkles className="h-4 w-4 text-primary-foreground" />
+          </div>
+          <span className="font-bold text-sm bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            Phanclon.ai
+          </span>
+        </div>
         <Button
           onClick={onNew}
-          className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90"
+          className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity"
+          size="sm"
         >
           <Plus className="h-4 w-4 mr-2" />
           New Chat
@@ -43,24 +52,32 @@ export const ConversationList = ({
               key={conversation.id}
               onClick={() => onSelect(conversation.id)}
               className={cn(
-                "w-full text-left p-3 rounded-lg transition-colors flex items-center gap-2",
+                "w-full text-left p-3 rounded-xl mb-1 transition-all",
                 activeId === conversation.id
-                  ? "bg-accent/20 text-foreground"
-                  : "hover:bg-accent/10 text-muted-foreground"
+                  ? "bg-gradient-to-r from-primary/20 to-accent/20 border border-primary/50 shadow-md"
+                  : "hover:bg-accent/10 border border-transparent"
               )}
             >
-              <MessageSquare className="h-4 w-4 shrink-0" />
-              <span className="truncate text-sm">{conversation.title}</span>
+              <div className="flex items-start gap-2">
+                <MessageSquare className="h-4 w-4 mt-0.5 flex-shrink-0 text-primary" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm truncate font-medium">{conversation.title || "New conversation"}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {new Date(conversation.updated_at).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
             </button>
           ))}
         </div>
       </ScrollArea>
 
-      <div className="p-4 border-t border-accent/20">
+      <div className="p-4 border-t border-accent/30">
         <Button
-          variant="outline"
+          variant="ghost"
           onClick={onLogout}
-          className="w-full border-accent/20"
+          className="w-full hover:bg-destructive/20"
+          size="sm"
         >
           <LogOut className="h-4 w-4 mr-2" />
           Logout
